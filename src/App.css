@@ -182,3 +182,79 @@
     border-right-color: var(--border);
   }
 }
+
+.prefill-panel {
+  margin-top: 12px;
+}
+
+.prefill-step-text {
+  margin: 0 0 6px;
+  color: #555;
+  font-size: 14px;
+}
+
+.prefill-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 4px;
+}
+
+.prefill-row-clickable {
+  cursor: pointer;
+}
+
+.prefill-row-clickable:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.prefill-row-mapped {
+  color: #1f8f45;
+}
+
+.prefill-remove-btn {
+  cursor: pointer;
+}
+
+.mapping-modal {
+  margin-top: 12px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+
+.mapping-modal-section-label {
+  margin: 12px 0 4px;
+  font-weight: 600;
+}
+
+.mapping-modal-helper-text {
+  margin: 0 0 10px;
+  color: #666;
+  font-size: 14px;
+}
+
+.mapping-modal-form-group {
+  margin-top: 12px;
+}
+
+.mapping-modal-form-name {
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.mapping-modal-option {
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  padding: 6px 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: transparent;
+}
+
+.mapping-modal-option:hover {
+  background: rgba(255, 255, 255, 0.08);
+}

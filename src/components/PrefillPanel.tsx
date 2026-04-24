@@ -20,7 +20,6 @@ export default function PrefillPanel({
   setPrefillState,
 }: Props) {
   const [activeFieldId, setActiveFieldId] = useState<string | null>(null)
-  const [hoveredFieldId, setHoveredFieldId] = useState<string | null>(null)
   const formMappings = prefillState[selectedForm.id] ?? {}
   const formNameById = useMemo(
     () => Object.fromEntries(allForms.map((form) => [form.id, form.name])),
@@ -66,9 +65,19 @@ export default function PrefillPanel({
     setActiveFieldId(null)
   }
 
+  function formatFieldName(fieldName: string): string {
+    if (!fieldName) {
+      return 'Field'
+    }
+
+    return `${fieldName.charAt(0).toUpperCase()}${fieldName.slice(1)}`
+  }
+
   return (
-    <div>
+    <div className="prefill-panel">
       <h3>{selectedForm.name}</h3>
+      <p className="prefill-step-text">Step 1: Select a field to configure</p>
+      <p className="prefill-step-text">Step 2: Choose a source from upstream forms</p>
       {selectedForm.fields.map((field) => {
         const mapping = formMappings[field.id]
         const isMapped = Boolean(mapping)
@@ -78,45 +87,30 @@ export default function PrefillPanel({
             : mapping?.sourceFormId
         const mappingText = mapping
           ? mapping.sourceType === 'form'
-            ? `${sourceFormName ?? 'Unknown form'}.${mapping.sourceFieldId ?? 'Unknown field'}`
+            ? `${formatFieldName(field.name)} field -> Prefilled from ${sourceFormName ?? 'Unknown form'} -> ${formatFieldName(mapping.sourceFieldId ?? 'Unknown field')}`
             : 'Global source'
-          : 'Click to map'
+          : `${formatFieldName(field.name)} field -> Click to map`
 
         return (
           <div
             key={field.id}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '4px 6px',
-              borderRadius: '4px',
+            className={`prefill-row ${!isMapped ? 'prefill-row-clickable' : ''} ${isMapped ? 'prefill-row-mapped' : ''}`}
+            onClick={() => {
+              if (!isMapped) {
+                setActiveFieldId(field.id)
+              }
             }}
           >
-            <button
-              type="button"
-              style={{
-                cursor: isMapped ? 'default' : 'pointer',
-                backgroundColor:
-                  !isMapped && hoveredFieldId === field.id ? '#ececec' : '#f5f5f5',
-                border: '1px solid #ddd',
-                borderRadius: '4px',
-                padding: '2px 6px',
-              }}
-              onMouseEnter={() => setHoveredFieldId(field.id)}
-              onMouseLeave={() => setHoveredFieldId(null)}
-              onClick={() => {
-                if (!isMapped) {
-                  setActiveFieldId(field.id)
-                }
-              }}
-            >
-              {field.name}
-            </button>
-            <span>{' -> '}</span>
-            <span>{mappingText}</span>
+            <span>{isMapped ? `✔ ${mappingText}` : mappingText}</span>
             {isMapped && (
-              <button type="button" onClick={() => handleRemoveMapping(field.id)}>
+              <button
+                type="button"
+                className="prefill-remove-btn"
+                onClick={(event) => {
+                  event.stopPropagation()
+                  handleRemoveMapping(field.id)
+                }}
+              >
                 X
               </button>
             )}

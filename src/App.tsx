@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import './App.css'
 import FormList from './components/FormList'
 import PrefillPanel from './components/PrefillPanel'
 import { useForms } from './hooks'
