@@ -1,9 +1,20 @@
-/**
- * Shared TypeScript types and interfaces used across the app.
- * Feature-specific types can stay next to that feature until they are reused.
- */
+export interface Field {
+  id: string
+  name: string
+}
 
-export type { Edge } from './edge'
-export type { Field } from './field'
-export type { FormNode } from './form-node'
-export type { GraphResponse } from './graph-response'
+export interface FormNode {
+  id: string
+  name: string
+  fields: Field[]
+}
+
+export interface Edge {
+  from: string
+  to: string
+}
+
+export interface GraphResponse {
+  nodes: FormNode[]
+  edges: Edge[]
+}
