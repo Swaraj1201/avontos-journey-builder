@@ -1,6 +1,7 @@
 import type { GraphResponse } from '../types'
 
-const FORMS_ENDPOINT = 'http://localhost:3000/action-blueprint-graph-get'
+const FORMS_ENDPOINT =
+  'http://localhost:3000/api/v1/demo/actions/blueprints/demo/graph'
 
 export async function fetchForms(): Promise<GraphResponse> {
   const res = await fetch(FORMS_ENDPOINT)
