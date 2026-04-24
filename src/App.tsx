@@ -29,9 +29,7 @@ function App() {
 
       <section>
         <h2>Selected Form</h2>
-        <div>
-          {selectedForm ? selectedForm.name : 'Select a form from the list'}
-        </div>
+        <div>{selectedForm ? selectedForm.name : 'Select a form to configure prefill'}</div>
         {selectedForm && (
           <PrefillPanel
             allForms={forms}

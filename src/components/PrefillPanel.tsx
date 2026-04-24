@@ -20,7 +20,12 @@ export default function PrefillPanel({
   setPrefillState,
 }: Props) {
   const [activeFieldId, setActiveFieldId] = useState<string | null>(null)
+  const [hoveredFieldId, setHoveredFieldId] = useState<string | null>(null)
   const formMappings = prefillState[selectedForm.id] ?? {}
+  const formNameById = useMemo(
+    () => Object.fromEntries(allForms.map((form) => [form.id, form.name])),
+    [allForms],
+  )
   const upstreamFormIds = useMemo(
     () => getUpstreamForms(edges, selectedForm.id),
     [edges, selectedForm.id],
@@ -67,16 +72,39 @@ export default function PrefillPanel({
       {selectedForm.fields.map((field) => {
         const mapping = formMappings[field.id]
         const isMapped = Boolean(mapping)
+        const sourceFormName =
+          mapping?.sourceFormId && formNameById[mapping.sourceFormId]
+            ? formNameById[mapping.sourceFormId]
+            : mapping?.sourceFormId
         const mappingText = mapping
           ? mapping.sourceType === 'form'
-            ? `${mapping.sourceFormId ?? 'Unknown form'}.${mapping.sourceFieldId ?? 'Unknown field'}`
+            ? `${sourceFormName ?? 'Unknown form'}.${mapping.sourceFieldId ?? 'Unknown field'}`
             : 'Global source'
-          : 'No mapping'
+          : 'Click to map'
 
         return (
-          <div key={field.id}>
+          <div
+            key={field.id}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '4px 6px',
+              borderRadius: '4px',
+            }}
+          >
             <button
               type="button"
+              style={{
+                cursor: isMapped ? 'default' : 'pointer',
+                backgroundColor:
+                  !isMapped && hoveredFieldId === field.id ? '#ececec' : '#f5f5f5',
+                border: '1px solid #ddd',
+                borderRadius: '4px',
+                padding: '2px 6px',
+              }}
+              onMouseEnter={() => setHoveredFieldId(field.id)}
+              onMouseLeave={() => setHoveredFieldId(null)}
               onClick={() => {
                 if (!isMapped) {
                   setActiveFieldId(field.id)
@@ -101,6 +129,7 @@ export default function PrefillPanel({
         onClose={() => setActiveFieldId(null)}
         onSelect={handleSelectMapping}
         availableForms={availableForms}
+        fieldName={selectedForm.fields.find((field) => field.id === activeFieldId)?.name ?? 'field'}
       />
     </div>
   )

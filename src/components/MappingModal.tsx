@@ -5,6 +5,7 @@ interface Props {
   onClose: () => void
   onSelect: (mapping: PrefillMapping) => void
   availableForms: FormNode[]
+  fieldName: string
 }
 
 export default function MappingModal({
@@ -12,6 +13,7 @@ export default function MappingModal({
   onClose,
   onSelect,
   availableForms,
+  fieldName,
 }: Props) {
   if (!isOpen) {
     return null
@@ -19,7 +21,8 @@ export default function MappingModal({
 
   return (
     <div>
-      <h4>Select Data Source</h4>
+      <h4>Select source for {fieldName}</h4>
+      <p>Choose upstream form field or global value</p>
       <button type="button" onClick={onClose}>
         Close
       </button>
