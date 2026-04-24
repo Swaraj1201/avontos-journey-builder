@@ -75,7 +75,14 @@ export default function PrefillPanel({
 
         return (
           <div key={field.id}>
-            <button type="button" onClick={() => setActiveFieldId(field.id)}>
+            <button
+              type="button"
+              onClick={() => {
+                if (!isMapped) {
+                  setActiveFieldId(field.id)
+                }
+              }}
+            >
               {field.name}
             </button>
             <span>{' -> '}</span>

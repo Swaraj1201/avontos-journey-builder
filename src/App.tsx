@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import FormList from './components/FormList'
+import PrefillPanel from './components/PrefillPanel'
 import { useForms } from './hooks'
-import type { FormNode } from './types'
+import type { FormNode, PrefillState } from './types'
 
 function App() {
   const { data, loading, error } = useForms()
   const [selectedForm, setSelectedForm] = useState<FormNode | null>(null)
+  const [prefillState, setPrefillState] = useState<PrefillState>({})
 
   if (loading) {
     return <p>Loading...</p>
@@ -16,6 +18,7 @@ function App() {
   }
 
   const forms = data?.nodes ?? []
+  const edges = data?.edges ?? []
 
   return (
     <main style={{ display: 'flex', gap: '24px', alignItems: 'flex-start' }}>
@@ -29,6 +32,15 @@ function App() {
         <div>
           {selectedForm ? selectedForm.name : 'Select a form from the list'}
         </div>
+        {selectedForm && (
+          <PrefillPanel
+            allForms={forms}
+            edges={edges}
+            selectedForm={selectedForm}
+            prefillState={prefillState}
+            setPrefillState={setPrefillState}
+          />
+        )}
       </section>
     </main>
   )
