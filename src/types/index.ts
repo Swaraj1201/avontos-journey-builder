@@ -18,3 +18,5 @@ export interface GraphResponse {
   nodes: FormNode[]
   edges: Edge[]
 }
+
+export type { PrefillMapping, PrefillState, SourceType } from './prefill'
