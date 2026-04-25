@@ -200,18 +200,19 @@
   gap: 8px;
   padding: 6px 8px;
   border-radius: 4px;
-}
-
-.prefill-row-clickable {
   cursor: pointer;
 }
 
-.prefill-row-clickable:hover {
+.prefill-row:hover {
   background: rgba(255, 255, 255, 0.05);
 }
 
 .prefill-row-mapped {
   color: #1f8f45;
+}
+
+.prefill-row-highlight {
+  background: rgba(31, 143, 69, 0.18);
 }
 
 .prefill-remove-btn {

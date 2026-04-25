@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { Dispatch, SetStateAction } from 'react'
 import MappingModal from './MappingModal'
 import { getUpstreamForms } from '../utils'
@@ -20,6 +20,7 @@ export default function PrefillPanel({
   setPrefillState,
 }: Props) {
   const [activeFieldId, setActiveFieldId] = useState<string | null>(null)
+  const [highlightedFieldId, setHighlightedFieldId] = useState<string | null>(null)
   const formMappings = prefillState[selectedForm.id] ?? {}
   const formNameById = useMemo(
     () => Object.fromEntries(allForms.map((form) => [form.id, form.name])),
@@ -33,6 +34,28 @@ export default function PrefillPanel({
     () => allForms.filter((form) => upstreamFormIds.includes(form.id)),
     [allForms, upstreamFormIds],
   )
+  const fieldNameByFormId = useMemo(
+    () =>
+      Object.fromEntries(
+        allForms.map((form) => [
+          form.id,
+          Object.fromEntries(form.fields.map((field) => [field.id, field.name])),
+        ]),
+      ),
+    [allForms],
+  )
+
+  useEffect(() => {
+    if (!highlightedFieldId) {
+      return
+    }
+
+    const timeout = window.setTimeout(() => {
+      setHighlightedFieldId(null)
+    }, 1200)
+
+    return () => window.clearTimeout(timeout)
+  }, [highlightedFieldId])
 
   function handleRemoveMapping(fieldId: string): void {
     setPrefillState((prev) => {
@@ -62,6 +85,7 @@ export default function PrefillPanel({
         },
       }
     })
+    setHighlightedFieldId(activeFieldId)
     setActiveFieldId(null)
   }
 
@@ -70,7 +94,20 @@ export default function PrefillPanel({
       return 'Field'
     }
 
-    return `${fieldName.charAt(0).toUpperCase()}${fieldName.slice(1)}`
+    return fieldName
+      .replace(/[_-]+/g, ' ')
+      .split(' ')
+      .filter(Boolean)
+      .map((part) => `${part.charAt(0).toUpperCase()}${part.slice(1)}`)
+      .join(' ')
+  }
+
+  function getSourceFieldName(mapping: PrefillMapping): string {
+    if (!mapping.sourceFormId || !mapping.sourceFieldId) {
+      return 'Unknown field'
+    }
+
+    return fieldNameByFormId[mapping.sourceFormId]?.[mapping.sourceFieldId] ?? mapping.sourceFieldId
   }
 
   return (
@@ -87,18 +124,16 @@ export default function PrefillPanel({
             : mapping?.sourceFormId
         const mappingText = mapping
           ? mapping.sourceType === 'form'
-            ? `${formatFieldName(field.name)} field -> Prefilled from ${sourceFormName ?? 'Unknown form'} -> ${formatFieldName(mapping.sourceFieldId ?? 'Unknown field')}`
+            ? `${formatFieldName(field.name)} field -> Prefilled from ${sourceFormName ?? 'Unknown form'} -> ${formatFieldName(getSourceFieldName(mapping))}`
             : 'Global source'
           : `${formatFieldName(field.name)} field -> Click to map`
 
         return (
           <div
             key={field.id}
-            className={`prefill-row ${!isMapped ? 'prefill-row-clickable' : ''} ${isMapped ? 'prefill-row-mapped' : ''}`}
+            className={`prefill-row ${isMapped ? 'prefill-row-mapped' : ''} ${highlightedFieldId === field.id ? 'prefill-row-highlight' : ''}`}
             onClick={() => {
-              if (!isMapped) {
-                setActiveFieldId(field.id)
-              }
+              setActiveFieldId(field.id)
             }}
           >
             <span>{isMapped ? `✔ ${mappingText}` : mappingText}</span>
