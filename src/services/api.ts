@@ -16,7 +16,6 @@ interface RawGraphResponse {
 }
 
 export async function fetchForms(): Promise<GraphResponse> {
-  console.log('Fetching:', FORMS_ENDPOINT)
   const res = await fetch(FORMS_ENDPOINT, {
     method: 'GET',
     headers: {
