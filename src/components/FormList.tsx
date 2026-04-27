@@ -2,16 +2,22 @@ import type { FormNode } from '../types'
 
 interface Props {
   forms: FormNode[]
+  selectedFormId: string | null
   onSelect: (form: FormNode) => void
 }
 
-export default function FormList({ forms, onSelect }: Props) {
+export default function FormList({ forms, selectedFormId, onSelect }: Props) {
   return (
-    <div>
+    <div className="forms-list">
       {forms.map((form) => (
-        <div key={form.id} onClick={() => onSelect(form)}>
+        <button
+          key={form.id}
+          type="button"
+          className={`form-list-item ${selectedFormId === form.id ? 'selected' : ''}`}
+          onClick={() => onSelect(form)}
+        >
           {form.name}
-        </div>
+        </button>
       ))}
     </div>
   )

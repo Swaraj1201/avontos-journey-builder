@@ -6,6 +6,8 @@ interface Props {
   onSelect: (mapping: PrefillMapping) => void
   availableForms: FormNode[]
   fieldName: string
+  targetFieldId: string | null
+  currentFormId: string
 }
 
 export default function MappingModal({
@@ -14,7 +16,19 @@ export default function MappingModal({
   onSelect,
   availableForms,
   fieldName,
+  targetFieldId,
+  currentFormId,
 }: Props) {
+  const globalFields = ['currentUser.email', 'currentUser.id']
+  const upstreamOptions = availableForms
+    .filter((form) => form.id !== currentFormId)
+    .map((form) => ({
+      ...form,
+      fields: form.fields.filter((field) => field.id === targetFieldId),
+    }))
+    .filter((form) => form.fields.length > 0)
+  const hasUpstreamForms = upstreamOptions.length > 0
+
   if (!isOpen) {
     return null
   }
@@ -22,36 +36,67 @@ export default function MappingModal({
   return (
     <div className="mapping-modal">
       <h4>Select source for {fieldName}</h4>
-      <p>Choose upstream form field or global value</p>
-      <p className="mapping-modal-section-label">Available data sources</p>
-      <p className="mapping-modal-helper-text">Select a field to map value from</p>
-      <button type="button" onClick={onClose}>
-        Close
-      </button>
+      <p className="mapping-modal-hint">You can only map data from forms that come before this one.</p>
+      <p className="mapping-modal-helper-text">Select a field to map value from.</p>
+      {hasUpstreamForms ? (
+        <div className="mapping-modal-section">
+          <p className="mapping-modal-section-label">From previous forms</p>
+          {upstreamOptions.map((form) => (
+            <div key={form.id} className="mapping-modal-form-group">
+              <div className="mapping-modal-form-name">{form.name}</div>
+              {form.fields.map((field) => (
+                <div key={field.id}>
+                  <button
+                    type="button"
+                    className="mapping-modal-option"
+                    onClick={() => {
+                      onSelect({
+                        sourceType: 'form',
+                        sourceFormId: form.id,
+                        sourceFieldId: field.id,
+                      })
+                      onClose()
+                    }}
+                  >
+                    {field.name}
+                  </button>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="mapping-modal-empty-state">
+          <p className="mapping-modal-empty-title">No upstream forms available for this form.</p>
+        </div>
+      )}
 
-      {availableForms.map((form) => (
-        <div key={form.id} className="mapping-modal-form-group">
-          <div className="mapping-modal-form-name">{form.name}</div>
-          {form.fields.map((field) => (
-            <div key={field.id}>
+      <div className="mapping-modal-section">
+        <p className="mapping-modal-section-label">Global Data</p>
+        <div className="mapping-modal-form-group">
+          {globalFields.map((fieldId) => (
+            <div key={fieldId}>
               <button
                 type="button"
                 className="mapping-modal-option"
                 onClick={() => {
                   onSelect({
-                    sourceType: 'form',
-                    sourceFormId: form.id,
-                    sourceFieldId: field.id,
+                    sourceType: 'global',
+                    sourceFieldId: fieldId,
                   })
                   onClose()
                 }}
               >
-                {field.name}
+                {fieldId}
               </button>
             </div>
           ))}
         </div>
-      ))}
+      </div>
+
+      <button type="button" className="mapping-modal-close" onClick={onClose}>
+        Close
+      </button>
     </div>
   )
 }

@@ -22,16 +22,22 @@ function App() {
   const edges = data?.edges ?? []
 
   return (
-    <main style={{ display: 'flex', gap: '24px', alignItems: 'flex-start' }}>
-      <section style={{ minWidth: '220px' }}>
-        <h2>Forms</h2>
-        <FormList forms={forms} onSelect={setSelectedForm} />
-      </section>
+    <main className="app-layout">
+      <aside className="sidebar">
+        <h2 className="sidebar-title">Forms</h2>
+        <FormList
+          forms={forms}
+          selectedFormId={selectedForm?.id ?? null}
+          onSelect={setSelectedForm}
+        />
+      </aside>
 
-      <section>
-        <h2>Selected Form</h2>
-        <div>{selectedForm ? selectedForm.name : 'Select a form to configure prefill'}</div>
-        {selectedForm && (
+      <section className="main-panel">
+        <div className="main-panel-header">
+          <h2>{selectedForm ? selectedForm.name : 'Select a form'}</h2>
+          <p className="main-panel-subtitle">Set up prefill behavior using upstream form data.</p>
+        </div>
+        {selectedForm ? (
           <PrefillPanel
             allForms={forms}
             edges={edges}
@@ -39,6 +45,8 @@ function App() {
             prefillState={prefillState}
             setPrefillState={setPrefillState}
           />
+        ) : (
+          <div className="empty-state">Choose a form from the sidebar to configure prefill.</div>
         )}
       </section>
     </main>

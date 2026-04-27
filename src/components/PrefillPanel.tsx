@@ -110,48 +110,93 @@ export default function PrefillPanel({
     return fieldNameByFormId[mapping.sourceFormId]?.[mapping.sourceFieldId] ?? mapping.sourceFieldId
   }
 
+  const mappedFields = selectedForm.fields.filter((field) => Boolean(formMappings[field.id]))
+
   return (
     <div className="prefill-panel">
-      <h3>{selectedForm.name}</h3>
-      <p className="prefill-step-text">Step 1: Select a field to configure</p>
-      <p className="prefill-step-text">Step 2: Choose a source from upstream forms</p>
-      {selectedForm.fields.map((field) => {
-        const mapping = formMappings[field.id]
-        const isMapped = Boolean(mapping)
-        const sourceFormName =
-          mapping?.sourceFormId && formNameById[mapping.sourceFormId]
-            ? formNameById[mapping.sourceFormId]
-            : mapping?.sourceFormId
-        const mappingText = mapping
-          ? mapping.sourceType === 'form'
-            ? `${formatFieldName(field.name)} field -> Prefilled from ${sourceFormName ?? 'Unknown form'} -> ${formatFieldName(getSourceFieldName(mapping))}`
-            : 'Global source'
-          : `${formatFieldName(field.name)} field -> Click to map`
+      <div className="prefill-panel-title-wrap">
+        <h3 className="prefill-panel-title">Configure Prefill</h3>
+      </div>
+      <div className="prefill-steps">
+        <p className="prefill-step-text">1. Select a field</p>
+        <p className="prefill-step-text">2. Choose a source from upstream forms</p>
+      </div>
+      <div className="prefill-configured-section">
+        <h4 className="prefill-configured-title">Configured Prefill Rules</h4>
+        {mappedFields.length === 0 ? (
+          <p className="prefill-configured-empty">
+            No fields configured yet.
+            <br />
+            Click a field above to start mapping.
+          </p>
+        ) : (
+          mappedFields.map((field) => {
+            const mapping = formMappings[field.id]
+            if (!mapping) {
+              return null
+            }
+            const sourceFormName =
+              mapping.sourceFormId && formNameById[mapping.sourceFormId]
+                ? formNameById[mapping.sourceFormId]
+                : mapping.sourceFormId
+            const ruleText =
+              mapping.sourceType === 'form'
+                ? `Auto-filled from ${sourceFormName ?? 'Unknown form'}'s ${formatFieldName(getSourceFieldName(mapping))} field`
+                : `Auto-filled from Global data ${formatFieldName(mapping.sourceFieldId ?? 'Unknown field')}`
 
-        return (
-          <div
-            key={field.id}
-            className={`prefill-row ${isMapped ? 'prefill-row-mapped' : ''} ${highlightedFieldId === field.id ? 'prefill-row-highlight' : ''}`}
-            onClick={() => {
-              setActiveFieldId(field.id)
-            }}
-          >
-            <span>{isMapped ? `✔ ${mappingText}` : mappingText}</span>
-            {isMapped && (
-              <button
-                type="button"
-                className="prefill-remove-btn"
-                onClick={(event) => {
-                  event.stopPropagation()
-                  handleRemoveMapping(field.id)
-                }}
-              >
-                X
-              </button>
-            )}
-          </div>
-        )
-      })}
+            return (
+              <p key={field.id} className="prefill-configured-item">
+                {formatFieldName(field.name)} field {'->'} {ruleText}
+              </p>
+            )
+          })
+        )}
+      </div>
+      <div className="prefill-fields-list">
+        {selectedForm.fields.map((field) => {
+          const mapping = formMappings[field.id]
+          const isMapped = Boolean(mapping)
+          const sourceFormName =
+            mapping?.sourceFormId && formNameById[mapping.sourceFormId]
+              ? formNameById[mapping.sourceFormId]
+              : mapping?.sourceFormId
+          const mappingText = mapping
+            ? mapping.sourceType === 'form'
+              ? `Auto-filled from ${sourceFormName ?? 'Unknown form'}'s ${formatFieldName(getSourceFieldName(mapping))} field`
+              : `Auto-filled from Global data ${formatFieldName(mapping.sourceFieldId ?? 'Unknown field')}`
+            : 'Click to map'
+
+          return (
+            <div
+              key={field.id}
+              className={`prefill-row ${isMapped ? 'prefill-row-mapped' : ''} ${highlightedFieldId === field.id ? 'prefill-row-highlight' : ''}`}
+              onClick={() => {
+                setActiveFieldId(field.id)
+              }}
+            >
+              <div className="prefill-row-content">
+                <div className="prefill-field-name">
+                  {isMapped ? '✔ ' : ''}
+                  {formatFieldName(field.name)} field
+                </div>
+                <div className="prefill-mapping-text">{mappingText}</div>
+              </div>
+              {isMapped && (
+                <button
+                  type="button"
+                  className="prefill-remove-btn"
+                  onClick={(event) => {
+                    event.stopPropagation()
+                    handleRemoveMapping(field.id)
+                  }}
+                >
+                  X
+                </button>
+              )}
+            </div>
+          )
+        })}
+      </div>
 
       <MappingModal
         isOpen={Boolean(activeFieldId)}
@@ -159,6 +204,8 @@ export default function PrefillPanel({
         onSelect={handleSelectMapping}
         availableForms={availableForms}
         fieldName={selectedForm.fields.find((field) => field.id === activeFieldId)?.name ?? 'field'}
+        targetFieldId={activeFieldId}
+        currentFormId={selectedForm.id}
       />
     </div>
   )
