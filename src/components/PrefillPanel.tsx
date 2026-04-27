@@ -124,7 +124,7 @@ export default function PrefillPanel({
       </div>
       {!hasUpstreamForms && (
         <p className="prefill-upstream-empty-message">
-          No upstream forms available. This form cannot be prefilled.
+          No upstream data sources available for this form.
         </p>
       )}
       <div className="prefill-configured-section">

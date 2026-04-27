@@ -67,7 +67,9 @@ export default function MappingModal({
         </div>
       ) : (
         <div className="mapping-modal-empty-state">
-          <p className="mapping-modal-empty-title">No upstream forms available for this form.</p>
+          <p className="mapping-modal-empty-title">
+            No upstream data sources available for this form.
+          </p>
         </div>
       )}
 
