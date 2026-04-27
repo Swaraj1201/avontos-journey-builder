@@ -34,6 +34,7 @@ export default function PrefillPanel({
     () => allForms.filter((form) => upstreamFormIds.includes(form.id)),
     [allForms, upstreamFormIds],
   )
+  const hasUpstreamForms = availableForms.length > 0
   const fieldNameByFormId = useMemo(
     () =>
       Object.fromEntries(
@@ -119,8 +120,13 @@ export default function PrefillPanel({
       </div>
       <div className="prefill-steps">
         <p className="prefill-step-text">1. Select a field</p>
-        <p className="prefill-step-text">2. Choose a source from upstream forms</p>
+        <p className="prefill-step-text">2. Choose a source form and field</p>
       </div>
+      {!hasUpstreamForms && (
+        <p className="prefill-upstream-empty-message">
+          No upstream forms available. This form cannot be prefilled.
+        </p>
+      )}
       <div className="prefill-configured-section">
         <h4 className="prefill-configured-title">Configured Prefill Rules</h4>
         {mappedFields.length === 0 ? (
@@ -164,14 +170,18 @@ export default function PrefillPanel({
             ? mapping.sourceType === 'form'
               ? `Auto-filled from ${sourceFormName ?? 'Unknown form'}'s ${formatFieldName(getSourceFieldName(mapping))} field`
               : `Auto-filled from Global data ${formatFieldName(mapping.sourceFieldId ?? 'Unknown field')}`
-            : 'Click to map'
+            : hasUpstreamForms
+              ? 'Click to map'
+              : 'Prefill unavailable for this form'
 
           return (
             <div
               key={field.id}
-              className={`prefill-row ${isMapped ? 'prefill-row-mapped' : ''} ${highlightedFieldId === field.id ? 'prefill-row-highlight' : ''}`}
+              className={`prefill-row ${isMapped ? 'prefill-row-mapped' : ''} ${highlightedFieldId === field.id ? 'prefill-row-highlight' : ''} ${!hasUpstreamForms && !isMapped ? 'prefill-row-disabled' : ''}`}
               onClick={() => {
-                setActiveFieldId(field.id)
+                if (hasUpstreamForms) {
+                  setActiveFieldId(field.id)
+                }
               }}
             >
               <div className="prefill-row-content">
@@ -199,7 +209,7 @@ export default function PrefillPanel({
       </div>
 
       <MappingModal
-        isOpen={Boolean(activeFieldId)}
+        isOpen={hasUpstreamForms && Boolean(activeFieldId)}
         onClose={() => setActiveFieldId(null)}
         onSelect={handleSelectMapping}
         availableForms={availableForms}

@@ -37,7 +37,7 @@ export default function MappingModal({
     <div className="mapping-modal">
       <h4>Select source for {fieldName}</h4>
       <p className="mapping-modal-hint">You can only map data from forms that come before this one.</p>
-      <p className="mapping-modal-helper-text">Select a field to map value from.</p>
+      <p className="mapping-modal-helper-text">Choose where to get this value from.</p>
       {hasUpstreamForms ? (
         <div className="mapping-modal-section">
           <p className="mapping-modal-section-label">From previous forms</p>
