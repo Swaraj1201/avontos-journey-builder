@@ -10,38 +10,54 @@ Users can:
 
 ## ⚙️ How to Run Locally
 
-### 1. Clone the repository
+You need **two terminals**. The Vite app proxies `/api` to `http://127.0.0.1:3000`, so the mock server must be running or you will see `ECONNREFUSED` / proxy errors.
 
-```bash
-git clone <your-repo-url>
-cd <repo-name>
+### Folder layout
+
+`avontos-journey-builder` and `frontendchallengeserver` are **sibling** directories under the same parent (e.g. `Avantos/`). There is **no** `avontos-journey-builder` folder inside `frontendchallengeserver`.
+
+```
+parent/
+├── avontos-journey-builder/   ← frontend (Vite, port 5173)
+└── frontendchallengeserver/   ← mock API (port 3000)
 ```
 
-### 2. Install frontend dependencies
+### 1. Clone and enter the frontend app
 
 ```bash
+git clone https://github.com/Swaraj1201/avontos-journey-builder.git
+cd avontos-journey-builder   # or: cd <repo-name> if your clone root is different
 npm install
 ```
 
-### 3. Start frontend
+### 2. Terminal A — mock API (start this first)
 
 ```bash
-npm run dev
-```
-
-### 4. Start mock server
-
-From the same parent directory as this project, the mock server lives in `frontendchallengeserver`:
-
-```bash
-cd ../frontendchallengeserver
+cd ../frontendchallengeserver   # from avontos-journey-builder; or cd frontendchallengeserver from parent
 npm install
 npm start
 ```
 
-### 5. Open app
+Leave this running. You should see: `Server is running on http://localhost:3000`.
+
+### 3. Terminal B — frontend
+
+```bash
+cd avontos-journey-builder   # path to this repo’s root
+npm run dev
+```
+
+### 4. Open app
 
 [http://localhost:5173](http://localhost:5173)
+
+### Troubleshooting
+
+| Problem | Cause | Fix |
+|--------|--------|-----|
+| `cd: no such file or directory: avontos-journey-builder` while inside `frontendchallengeserver` | That folder is not nested there | Use `cd ../avontos-journey-builder`, or open a new shell and `cd` to the real path |
+| `Missing script: "dev"` | `npm run dev` ran in the mock server folder (no Vite) | `cd` to `avontos-journey-builder` then `npm run dev` |
+| `http proxy error` / `ECONNREFUSED 127.0.0.1:3000` | Mock server not listening on 3000 | In another terminal, `cd ../frontendchallengeserver && npm start` |
 
 ## 🧠 Key Concepts
 
